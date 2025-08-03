@@ -1,20 +1,25 @@
+#include "stdlib.fc"
+
 () recv_internal(int msg_value, cell in_msg, slice in_msg_body) impure {
     ;; Ignore empty messages
-    if (null?(in_msg_body)) {
+    if (slice_empty?(in_msg_body)) {
         return ();
     }
 
     ;; Get sender address
     slice sender = in_msg_body~load_msg_addr();
 
-    ;; Get current counter value
-    int counter = get_data()~load_uint(32);
+    ;; Get current counter value from storage
+    slice data = begin_parse(get_data());
+    int counter = data~load_uint(32);
 
     ;; Increment counter
     counter += 1;
 
     ;; Save new counter value
-    set_data(counter~store_uint(32));
+    builder b = begin_cell();
+    b = store_uint(b, counter, 32);
+    set_data(end_cell(b));
 
     ;; Send response with current counter value
     cell out_msg = begin_cell()
@@ -34,5 +39,6 @@
 
 (int) get_counter() method_id {
     ;; Return current counter value
-    return get_data()~load_uint(32);
+    slice data = begin_parse(get_data());
+    return data~load_uint(32);
 }
