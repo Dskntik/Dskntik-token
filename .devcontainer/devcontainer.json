@@ -1,7 +1,20 @@
 {
-  "name": "Minimal Ubuntu Workspace",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu", 
-  "features": {},
-  "postCreateCommand": "echo 'Welcome to minimal Ubuntu container!'",
-  "remoteUser": "vscode"
+  "name": "Tact Development Environment",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "postCreateCommand": "npm install -g @tact-lang/tact && tact --version",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-typescript-next",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  },
+  "runArgs": ["--privileged", "--volume=/var/lib/docker"],
+  "containerEnv": {
+    "PATH": "${PATH}:/usr/local/bin"
+  }
 }
