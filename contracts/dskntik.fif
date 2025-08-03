@@ -1,0 +1,45 @@
+"Asm.fif" include
+// automatically generated from `contracts/dskntik.fc` incl:`contracts/stdlib.fc` 
+PROGRAM{
+  DECLPROC save_state
+  DECLPROC load_state
+  1668248942 DECLMETHOD get_counter
+  DECLPROC init
+  DECLPROC recv_internal
+  save_state PROC:<{
+    //  counter
+    NEWC	//  counter _2
+    64 STU	//  _4
+    ENDC	//  state
+    c4 POP
+  }>
+  load_state PROC:<{
+    // 
+    c4 PUSH	//  state
+    CTOS	//  s
+    64 LDU	//  _9 _8
+    DROP	//  counter
+  }>
+  get_counter PROC:<{
+    // 
+    load_state CALLDICT	//  _0
+  }>
+  init PROC:<{
+    // 
+    0 PUSHINT	//  _0=0
+    save_state CALLDICT
+  }>
+  recv_internal PROC:<{
+    //  msg_value in_msg in_msg_body
+    2 1 BLKDROP2	//  ds
+    32 LDU	//  _16 _15
+    DROP	//  op
+    6909539 PUSHINT	//  op _8=6909539
+    EQUAL	//  _9
+    IF:<{	// 
+      load_state CALLDICT	//  counter
+      INC	//  counter
+      save_state CALLDICT
+    }>	// 
+  }>
+}END>c
