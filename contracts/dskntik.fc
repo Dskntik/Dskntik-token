@@ -1,126 +1,39 @@
 #include "stdlib.fc";
 
 ;; Функція для збереження стану
-() save_state(int total_supply, int supporters_count, slice admin_address, cell balances) impure {
+() save_state(int counter) impure {
     cell state = begin_cell()
-        .store_uint(total_supply, 64)
-        .store_uint(supporters_count, 64)
-        .store_slice(admin_address)
-        .store_ref(balances)
+        .store_uint(counter, 64)
         .end_cell();
     set_data(state);
 }
 
 ;; Функція для зчитування стану
-(int, int, slice, cell) load_state() {
+(int) load_state() {
     cell state = get_data();
     slice s = state.begin_parse();
-    int total_supply = s~load_uint(64);
-    int supporters_count = s~load_uint(64);
-    slice admin_address = s~load_bits(256);
-    cell balances = s~load_ref();
-    return (total_supply, supporters_count, admin_address, balances);
+    int counter = s~load_uint(64);
+    return counter;
 }
 
-;; Допоміжна функція для роботи з dictionary
-(int) get_dict(cell dict, slice key) {
-    var (value_slice, exists) = dict_get?(dict, 256, key); ;; Виправлено: правильний порядок аргументів
-    return exists ? value_slice~load_uint(64) : 0; ;; Конвертуємо slice у int
-}
-
-(cell) set_dict(cell dict, slice key, int value) {
-    slice value_slice = begin_cell().store_uint(value, 64).end_cell().begin_parse();
-    return dict_set(dict, 256, key, value_slice); ;; Виправлено: використовуємо dict_set
-}
-
-;; Функція для відправлення кількості підтримувачів
-() send_supporters_count(slice to_address, int supporters_count) impure {
-    var msg = begin_cell()
-        .store_uint(0x73757063, 32) ;; op = "supc" (supporters count)
-        .store_uint(supporters_count, 64)
-        .end_cell();
-    send_raw_message(to_address, msg, 64); ;; 64 = відправити залишок газу
-}
-
-;; Функція для підтвердження трансферу
-() send_transfer_confirmation(slice sender, slice recipient, int amount) impure {
-    var msg = begin_cell()
-        .store_uint(0x7472636e, 32) ;; op = "trcn" (transfer confirmation)
-        .store_slice(recipient)
-        .store_uint(amount, 64)
-        .end_cell();
-    send_raw_message(sender, msg, 64); ;; 64 = відправити залишок газу
-}
-
-;; Функція для отримання балансу
-(int) get_balance(slice address) method_id(0x62616c61) { ;; "bala" в hex
-    var (total_supply, supporters_count, admin_address, balances) = load_state();
-    return get_dict(balances, address);
-}
-
-;; Функція для отримання кількості підтримувачів
-(int) get_supporters_count() method_id(0x73757063) { ;; "supc" в hex
-    var (total_supply, supporters_count, admin_address, balances) = load_state();
-    return supporters_count;
+;; Геттер для отримання значення лічильника
+(int) get_counter() method_id(0x636f756e) { ;; "coun" в hex
+    return load_state();
 }
 
 ;; Ініціалізація контракту
 () init() impure {
-    ;; Початковий стан: 10 млрд токенів, 0 підтримувачів, адмін = розгортач контракту
-    var total_supply = 10000000000; ;; 10,000,000,000 токенів
-    var supporters_count = 0;
-    slice admin_address = my_address();
-    cell balances = new_dict();
-    save_state(total_supply, supporters_count, admin_address, balances);
+    save_state(0); ;; Початкове значення лічильника = 0
 }
 
-;; Основна функція обробки вхідних повідомлень
+;; Обробка вхідних повідомлень
 () recv_internal(int msg_value, cell in_msg, slice in_msg_body) impure {
-    ;; Перевіряємо, чи повідомлення містить команду
     slice ds = in_msg_body;
     int op = ds~load_uint(32); ;; Операційний код
     
-    ;; Отримуємо адресу відправника
-    slice sender = in_msg~load_msg_addr();
-    var (total_supply, supporters_count, admin_address, balances) = load_state();
-    
-    if (op == 0x73757070) { ;; "supp" в hex (Support Human Rightism)
-        ;; Перевіряємо, чи користувач ще не отримував токен
-        int already_supported = get_dict(balances, sender);
-        throw_unless(100, already_supported == 0); ;; Помилка, якщо користувач уже підтримував
-        
-        ;; Оновлюємо баланс користувача (+1 токен)
-        balances = set_dict(balances, sender, 1);
-        
-        ;; Збільшуємо лічильник підтримувачів
-        supporters_count += 1;
-        
-        ;; Зберігаємо оновлений стан
-        save_state(total_supply, supporters_count, admin_address, balances);
-        
-        ;; Відправляємо повідомлення з кількістю підтримувачів
-        send_supporters_count(sender, supporters_count);
-    }
-    
-    if (op == 0x7472616e) { ;; "tran" в hex (transfer)
-        ;; Зчитуємо параметри трансферу
-        slice recipient = ds~load_addr(); ;; Адреса одержувача
-        int amount = ds~load_uint(64); ;; Кількість токенів
-        
-        ;; Перевіряємо, чи достатньо токенів у відправника
-        int sender_balance = get_dict(balances, sender);
-        throw_unless(101, sender_balance >= amount); ;; Помилка, якщо недостатньо токенів
-        throw_unless(102, amount > 0); ;; Помилка, якщо сума <= 0
-        
-        ;; Оновлюємо баланси
-        balances = set_dict(balances, sender, sender_balance - amount);
-        int recipient_balance = get_dict(balances, recipient);
-        balances = set_dict(balances, recipient, recipient_balance + amount);
-        
-        ;; Зберігаємо оновлений стан
-        save_state(total_supply, supporters_count, admin_address, balances);
-        
-        ;; Відправляємо повідомлення про успішний трансфер
-        send_transfer_confirmation(sender, recipient, amount);
+    if (op == 0x696e63) { ;; "inc" в hex (increment)
+        int counter = load_state();
+        counter += 1;
+        save_state(counter);
     }
 }
