@@ -11,7 +11,7 @@
       "version": "18"
     }
   },
-  "postCreateCommand": "npm install -g @tact-lang/tact@latest && tact --version",
+  "postCreateCommand": "npm install -g @tact-lang/tact@1.2.0 && tact --version",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -24,5 +24,5 @@
   "containerEnv": {
     "PATH": "${PATH}:/usr/local/bin:/home/vscode/.nvm/versions/node/v18.20.8/bin"
   },
-  "onCreateCommand": "apt-get update && apt-get install -y coreutils && service docker start"
+  "onCreateCommand": "apt-get update && apt-get install -y coreutils procps && service docker start"
 }
