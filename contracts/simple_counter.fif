@@ -1,2 +1,5 @@
 // automatically generated from `contracts/stdlib.fc` `contracts/simple_counter.fc` 
 DECLPROC test
+test PROC:<{
+  INC
+}>

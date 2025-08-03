@@ -1,3 +1,26 @@
-int test(int x) {
-    return x + 1;
+#include "stdlib.fc"
+
+main(int msg_value, cell in_msg, slice in_msg_body) {
+    slice data = begin_parse(get_data());
+    int counter = 0;
+    if (!slice_empty?(data)) {
+        counter = data~load_uint(32);
+    }
+    counter = counter + 1;
+    builder b = begin_cell();
+    b = store_uint(b, counter, 32);
+    set_data(end_cell(b));
+    return ();
+}
+
+get_counter() {
+    slice data = begin_parse(get_data());
+    if (slice_empty?(data)) {
+        return 0;
+    }
+    return data~load_uint(32);
+}
+
+main_external(slice in_msg_body) {
+    return ();
 }
