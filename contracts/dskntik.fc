@@ -26,7 +26,7 @@
     return ();
 }
 
-(int) get_counter() method_id {
+(int) get_counter() {
     slice data = begin_parse(get_data());
     return data~load_uint(32);
 }
