@@ -1,24 +1,7 @@
 {
-  "name": "TON Dev Container",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "ms-vscode.cpptools",
-        "ms-azuretools.vscode-docker",
-        "ms-python.python"
-      ],
-      "settings": {
-        "terminal.integrated.defaultProfile.linux": "bash",
-        "terminal.integrated.profiles.linux": {
-          "bash": {
-            "path": "/bin/bash"
-          }
-        }
-      }
-    }
-  },
+  "name": "Minimal Ubuntu Workspace",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu", 
+  "features": {},
+  "postCreateCommand": "echo 'Welcome to minimal Ubuntu container!'",
   "remoteUser": "vscode"
 }
