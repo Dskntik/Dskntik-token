@@ -1,0 +1,5 @@
+// automatically generated from `contracts/minimal.fc` 
+DECLPROC test
+test PROC:<{
+  INC
+}>
