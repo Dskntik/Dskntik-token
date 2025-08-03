@@ -1,38 +1,38 @@
-;; Найпростіший смарт-контракт: лічильник без stdlib.fc
-
-;; Збереження стану (лічильника)
-() save_state(int counter) impure {
-    ;; Створюємо cell і зберігаємо 64-бітне число
-    var b = new_builder();
-    b = b.store_uint(counter, 64);
-    var state = b.end_cell();
-    set_data(state);
-}
-
-;; Зчитування стану
-(int) load_state() {
-    var state = get_data();
-    var s = state.begin_parse();
-    var counter = s.load_uint(64);
-    return counter;
-}
-
-;; Геттер для лічильника
-(int) get_counter() method_id(0x636f756e) { ;; "coun" в hex
-    return load_state();
-}
-
-;; Ініціалізація контракту
-() init() impure {
-    save_state(0); ;; Початкове значення = 0
-}
-
-;; Обробка вхідних повідомлень
 () recv_internal(int msg_value, cell in_msg, slice in_msg_body) impure {
-    var op = in_msg_body.load_uint(32); ;; Читаємо операційний код
-    if (op == 0x696e63) { ;; "inc" в hex
-        var counter = load_state();
-        counter = counter + 1;
-        save_state(counter);
+    ;; Ignore empty messages
+    if (null?(in_msg_body)) {
+        return ();
     }
+
+    ;; Get sender address
+    slice sender = in_msg_body~load_msg_addr();
+
+    ;; Get current counter value
+    int counter = get_data()~load_uint(32);
+
+    ;; Increment counter
+    counter += 1;
+
+    ;; Save new counter value
+    set_data(counter~store_uint(32));
+
+    ;; Send response with current counter value
+    cell out_msg = begin_cell()
+        .store_uint(0x18, 6) ;; opcode for simple message
+        .store_slice(sender)
+        .store_uint(0, 64) ;; no value transfer
+        .store_uint(counter, 32) ;; send current counter
+        .end_cell();
+
+    send_raw_message(out_msg, 0);
+}
+
+() recv_external(slice in_msg_body) impure {
+    ;; External messages are not processed in this simple contract
+    return ();
+}
+
+(int) get_counter() method_id {
+    ;; Return current counter value
+    return get_data()~load_uint(32);
 }
