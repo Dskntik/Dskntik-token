@@ -1,9 +1,10 @@
 #include "stdlib.fc"
 
-recv_internal(int msg_value, cell in_msg, slice in_msg_body) impure {
+() main_internal(int msg_value, cell in_msg, slice in_msg_body) impure {
     if (slice_empty?(in_msg_body)) {
         return ();
     }
+
     slice sender = in_msg_body~load_msg_addr();
     slice data = begin_parse(get_data());
     int counter = data~load_uint(32);
@@ -11,6 +12,7 @@ recv_internal(int msg_value, cell in_msg, slice in_msg_body) impure {
     builder b = begin_cell();
     b = store_uint(b, counter, 32);
     set_data(end_cell(b));
+
     cell out_msg = begin_cell()
         .store_uint(0x18, 6)
         .store_slice(sender)
@@ -20,7 +22,7 @@ recv_internal(int msg_value, cell in_msg, slice in_msg_body) impure {
     send_raw_message(out_msg, 0);
 }
 
-recv_external(slice in_msg_body) impure {
+() main_external(slice in_msg_body) impure {
     return ();
 }
 
