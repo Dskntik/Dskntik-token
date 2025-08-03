@@ -1,25 +1,7 @@
 {
-  "name": "Tact Development Environment",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
-  "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {
-      "version": "latest",
-      "enableNonRootDocker": true,
-      "moby": true
-    }
-  },
-  "postCreateCommand": "npm install -g @tact-lang/tact@1.2.0 && tact --version",
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "ms-vscode.vscode-typescript-next",
-        "dbaeumer.vscode-eslint"
-      ]
-    }
-  },
-  "runArgs": ["--privileged"],
-  "containerEnv": {
-    "PATH": "${PATH}:/usr/local/bin:/home/vscode/.nvm/versions/node/v18.20.8/bin"
-  },
-  "onCreateCommand": "apt-get update && apt-get install -y coreutils procps && service docker start"
+  "name": "Minimal Ubuntu Workspace",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu", 
+  "features": {},
+  "postCreateCommand": "echo 'Welcome to minimal Ubuntu container!'",
+  "remoteUser": "vscode"
 }
