@@ -8,11 +8,13 @@ RUN apt update && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install toncli
-RUN pip3 install toncli
+# Install TON tools (func, fift)
+RUN curl -sL https://github.com/ton-blockchain/ton/releases/download/v2023.06/ton-linux-x86_64 -o /usr/local/bin/ton && \
+    chmod +x /usr/local/bin/ton
 
-# Create vscode user and set up home directory
-RUN useradd -m -s /bin/bash vscode && \
+# Create workspace directory and set up vscode user
+RUN mkdir -p /workspace && \
+    useradd -m -s /bin/bash vscode && \
     chown -R vscode:vscode /workspace
 
 USER vscode
