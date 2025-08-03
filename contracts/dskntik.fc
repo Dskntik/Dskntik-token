@@ -1,39 +1,38 @@
-#include "stdlib.fc";
+;; Найпростіший смарт-контракт: лічильник без stdlib.fc
 
-;; Функція для збереження стану
+;; Збереження стану (лічильника)
 () save_state(int counter) impure {
-    cell state = begin_cell()
-        .store_uint(counter, 64)
-        .end_cell();
+    ;; Створюємо cell і зберігаємо 64-бітне число
+    var b = new_builder();
+    b = b.store_uint(counter, 64);
+    var state = b.end_cell();
     set_data(state);
 }
 
-;; Функція для зчитування стану
+;; Зчитування стану
 (int) load_state() {
-    cell state = get_data();
-    slice s = state.begin_parse();
-    int counter = s~load_uint(64);
+    var state = get_data();
+    var s = state.begin_parse();
+    var counter = s.load_uint(64);
     return counter;
 }
 
-;; Геттер для отримання значення лічильника
+;; Геттер для лічильника
 (int) get_counter() method_id(0x636f756e) { ;; "coun" в hex
     return load_state();
 }
 
 ;; Ініціалізація контракту
 () init() impure {
-    save_state(0); ;; Початкове значення лічильника = 0
+    save_state(0); ;; Початкове значення = 0
 }
 
 ;; Обробка вхідних повідомлень
 () recv_internal(int msg_value, cell in_msg, slice in_msg_body) impure {
-    slice ds = in_msg_body;
-    int op = ds~load_uint(32); ;; Операційний код
-    
-    if (op == 0x696e63) { ;; "inc" в hex (increment)
-        int counter = load_state();
-        counter += 1;
+    var op = in_msg_body.load_uint(32); ;; Читаємо операційний код
+    if (op == 0x696e63) { ;; "inc" в hex
+        var counter = load_state();
+        counter = counter + 1;
         save_state(counter);
     }
 }
