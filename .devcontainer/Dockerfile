@@ -8,9 +8,16 @@ RUN apt update && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install TON tools (func, fift)
-RUN curl -sL https://github.com/ton-blockchain/ton/releases/download/v2023.06/ton-linux-x86_64 -o /usr/local/bin/ton && \
-    chmod +x /usr/local/bin/ton
+# Install TON tools (func, fift) by building from source
+RUN git clone https://github.com/ton-blockchain/ton.git /ton && \
+    cd /ton && \
+    mkdir build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Release .. && \
+    make -j4 func fift && \
+    cp func/fift /usr/local/bin/fift && \
+    cp func/func /usr/local/bin/func && \
+    chmod +x /usr/local/bin/func /usr/local/bin/fift && \
+    cd / && rm -rf /ton
 
 # Create workspace directory and set up vscode user
 RUN mkdir -p /workspace && \
