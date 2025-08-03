@@ -1,0 +1,14 @@
+{
+  "name": "TON Dev Container",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "settings": {},
+  "extensions": [
+    "ms-vscode.cpptools",
+    "ms-azuretools.vscode-docker",
+    "ms-python.python"
+  ],
+  "postCreateCommand": "pip3 install toncli",
+  "remoteUser": "vscode"
+}
