@@ -1,14 +1,11 @@
 {
   "name": "Tact Development Environment",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {
       "version": "latest",
       "enableNonRootDocker": true,
       "moby": true
-    },
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "18"
     }
   },
   "postCreateCommand": "npm install -g @tact-lang/tact@1.2.0 && tact --version",
