@@ -1,8 +1,5 @@
 #include "stdlib.fc"
 
-; Контракт зберігає лічильник у persistent storage (cell c4).
-; Кожен внутрішній меседж збільшує лічильник на 1.
-
 main(int msg_value, cell in_msg, slice in_msg_body) {
     slice data = begin_parse(get_data());
     int counter = 0;
