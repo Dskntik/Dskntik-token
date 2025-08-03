@@ -1,6 +1,6 @@
 #include "stdlib.fc"
 
-() recv_internal(int msg_value, cell in_msg, slice in_msg_body) impure {
+recv_internal(int msg_value, cell in_msg, slice in_msg_body) impure {
     if (slice_empty?(in_msg_body)) {
         return ();
     }
@@ -20,7 +20,7 @@
     send_raw_message(out_msg, 0);
 }
 
-() recv_external(slice in_msg_body) impure {
+recv_external(slice in_msg_body) impure {
     return ();
 }
 
