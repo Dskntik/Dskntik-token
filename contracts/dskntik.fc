@@ -1,8 +1,7 @@
 #include "stdlib.fc"
 
-main(int msg_value, cell in_msg, slice in_msg_body) impure =
-    if (slice_empty?(in_msg_body)) then
-        ()
+main(int msg_value, cell in_msg, slice in_msg_body) =
+    if (slice_empty?(in_msg_body)) then ()
     else {
         slice sender = in_msg_body~load_msg_addr();
         slice data = begin_parse(get_data());
@@ -19,10 +18,10 @@ main(int msg_value, cell in_msg, slice in_msg_body) impure =
             .store_uint(counter, 32)
             .end_cell();
         send_raw_message(out_msg, 0);
-    };
+    }
+;
 
-main_external(slice in_msg_body) impure =
-    ();
+main_external(slice in_msg_body) = ();
 
 get_counter() =
     slice data = begin_parse(get_data());
