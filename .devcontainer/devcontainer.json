@@ -2,9 +2,16 @@
   "name": "Tact Development Environment",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "enableNonRootDocker": true,
+      "moby": true
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    }
   },
-  "postCreateCommand": "npm install -g @tact-lang/tact && tact --version",
+  "postCreateCommand": "npm install -g @tact-lang/tact@latest && tact --version",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -13,8 +20,9 @@
       ]
     }
   },
-  "runArgs": ["--privileged", "--volume=/var/lib/docker"],
+  "runArgs": ["--privileged"],
   "containerEnv": {
     "PATH": "${PATH}:/usr/local/bin"
-  }
+  },
+  "onCreateCommand": "apt-get update && apt-get install -y coreutils"
 }
