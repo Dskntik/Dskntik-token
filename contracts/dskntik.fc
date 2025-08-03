@@ -17,20 +17,20 @@
     slice s = state.begin_parse();
     int total_supply = s~load_uint(64);
     int supporters_count = s~load_uint(64);
-    slice admin_address = s~load_bits(256); ;; Виправлено: load_bits замість load_slice
+    slice admin_address = s~load_bits(256);
     cell balances = s~load_ref();
     return (total_supply, supporters_count, admin_address, balances);
 }
 
 ;; Допоміжна функція для роботи з dictionary
 (int) get_dict(cell dict, slice key) {
-    var (value, exists) = dict~dict_get_int(key, 256); ;; Виправлено: dict_get_int замість dict_get
-    return exists ? value : 0;
+    var (value_slice, exists) = dict~dict_get?(256, key); ;; Використовуємо dict_get? для slice ключа
+    return exists ? value_slice~load_uint(64) : 0; ;; Конвертуємо slice у int
 }
 
 (cell) set_dict(cell dict, slice key, int value) {
-    slice value_slice = begin_cell().store_uint(value, 64).end_cell().begin_parse(); ;; Конвертуємо int у slice
-    return dict~dict_set(key, 256, value_slice); ;; Виправлено: передаємо slice замість int
+    slice value_slice = begin_cell().store_uint(value, 64).end_cell().begin_parse();
+    return dict~dict_set(256, key, value_slice); ;; Використовуємо dict_set для slice ключа
 }
 
 ;; Функція для відправлення кількості підтримувачів
@@ -70,8 +70,7 @@
     var total_supply = 10000000000; ;; 10,000,000,000 токенів
     var supporters_count = 0;
     slice admin_address = my_address();
-    cell balances = empty_dict();
-    
+    cell balances = new_dict(); ;; Використовуємо new_dict замість empty_dict
     save_state(total_supply, supporters_count, admin_address, balances);
 }
 
