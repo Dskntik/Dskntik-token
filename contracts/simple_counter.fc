@@ -1,7 +1,7 @@
 #include "stdlib.fc"
 
-// Контракт зберігає лічильник у persistent storage (cell c4).
-// Кожен внутрішній меседж збільшує лічильник на 1.
+; Контракт зберігає лічильник у persistent storage (cell c4).
+; Кожен внутрішній меседж збільшує лічильник на 1.
 
 main(int msg_value, cell in_msg, slice in_msg_body) {
     slice data = begin_parse(get_data());
@@ -16,7 +16,6 @@ main(int msg_value, cell in_msg, slice in_msg_body) {
     return ();
 }
 
-// Геттер для читання лічильника
 get_counter() {
     slice data = begin_parse(get_data());
     if (slice_empty?(data)) {
@@ -25,7 +24,6 @@ get_counter() {
     return data~load_uint(32);
 }
 
-// Обробка зовнішніх повідомлень (нічого не робить)
 main_external(slice in_msg_body) {
     return ();
 }
