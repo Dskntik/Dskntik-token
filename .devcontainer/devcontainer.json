@@ -22,7 +22,7 @@
   },
   "runArgs": ["--privileged"],
   "containerEnv": {
-    "PATH": "${PATH}:/usr/local/bin"
+    "PATH": "${PATH}:/usr/local/bin:/home/vscode/.nvm/versions/node/v18.20.8/bin"
   },
-  "onCreateCommand": "apt-get update && apt-get install -y coreutils"
+  "onCreateCommand": "apt-get update && apt-get install -y coreutils && service docker start"
 }
