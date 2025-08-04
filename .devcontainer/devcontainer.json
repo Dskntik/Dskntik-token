@@ -1,7 +1,13 @@
 {
-  "name": "Minimal Ubuntu Workspace",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu", 
-  "features": {},
-  "postCreateCommand": "echo 'Welcome to minimal Ubuntu container!'",
+  "name": "TON Tact Dev",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/common-utils:1": {}
+  },
+  "postCreateCommand": "npm install -g tact blueprint && echo '✅ Tact & Blueprint installed!'",
   "remoteUser": "vscode"
 }
